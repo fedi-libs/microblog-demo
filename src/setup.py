@@ -1,9 +1,15 @@
+import uuid
+
 import aiosqlite
 import bcrypt
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from fastapi import APIRouter, Form, Response
 from fastapi.responses import RedirectResponse
 
 from .shared import check_users_found, login_user
+from .config import HOST, SCHEME
 
 router = APIRouter()
 
@@ -15,22 +21,46 @@ async def setup_complete(username: str = Form(), password: str = Form()):
         return Response(status_code=500, content="Setup Failed; User already exists")
     else:
         async with aiosqlite.connect("microblog.db") as db:
+            user_id = str(uuid.uuid4())
             password = password.encode("utf-8")
-            salt =  bcrypt.gensalt(rounds=12, prefix=b'2b')
+            salt = bcrypt.gensalt(rounds=12, prefix=b"2b")
             hashed = bcrypt.hashpw(password, salt)
             await db.execute(
                 """
-                        INSERT INTO Users (username, name, password, url, uri, inbox, shared_inbox)
+                        INSERT INTO Users (id, username, name, password, url, inbox, shared_inbox)
                         VALUES (?, ?, ?, ?, ?, ?, ?)
                         """,
                 (
+                    user_id,
                     username,
                     username,
                     hashed,
-                    f"/@{username}",
-                    f"/@{username}",
+                    f"{SCHEME}://{HOST}/@{username}",
                     "/inbox",
                     None,
+                ),
+            )
+            priv = rsa.generate_private_key(
+                key_size=3072, public_exponent=65537, backend=default_backend()
+            )
+            await db.execute(
+                """
+                INSERT INTO Keys (id, user_id, public_key, private_key, key_type)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    f"{SCHEME}://{HOST}/@{username}#main-key",
+                    user_id,
+                    priv.public_key().public_bytes(
+                        encoding=serialization.Encoding.PEM,
+                        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+                    ).decode("utf-8"),
+                    priv.private_bytes(
+                        encoding=serialization.Encoding.PEM,
+                        format=serialization.PrivateFormat.PKCS8,
+                        encryption_algorithm=serialization.NoEncryption(),
+                    ).decode("utf-8"),
+                    "RSASSA-PKCS1-v1_5",
                 ),
             )
             await db.commit()

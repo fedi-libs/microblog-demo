@@ -1,11 +1,10 @@
 CREATE TABLE IF NOT EXISTS Users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY NOT NULL,
     username TEXT NOT NULL,
     host TEXT,
     name TEXT,
     password TEXT,
     url TEXT NOT NULL,
-    uri TEXT NOT NULL,
     inbox TEXT NOT NULL,
     shared_inbox TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -17,7 +16,6 @@ CREATE TABLE IF NOT EXISTS Users (
 CREATE TABLE IF NOT EXISTS Posts (
     id TEXT PRIMARY KEY NOT NULL,
     user_id INTEGER NOT NULL,
-    uri TEXT NOT NULL,
     url TEXT,
     content TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -35,7 +33,7 @@ CREATE TABLE IF NOT EXISTS Followers (
 );
 
 CREATE TABLE IF NOT EXISTS Keys (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY NOT NULL,
     user_id INTEGER NOT NULL,
     public_key TEXT NOT NULL,
     private_key TEXT,

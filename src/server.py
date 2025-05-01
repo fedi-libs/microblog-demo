@@ -1,22 +1,75 @@
 from typing import Union
 
-from fastapi import Cookie, FastAPI, Request
+from apkit import APKit
+from apkit.x.starlette import ActivityPubMiddleware
+from apmodel import Person
+from apmodel.security.cryptographickey import CryptographicKey
+from fastapi import Cookie, FastAPI, Request, Response
+from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 
-from . import setup, shared, db_setup, post
+from . import setup, shared, db_setup, post, config
 
 db_setup.run_setup()
 app = FastAPI()
+ap = APKit(
+    name="Microblog",
+    description="A simple microblogging demo",
+)
 app.include_router(setup.router)
 app.include_router(post.router)
+app.add_middleware(ActivityPubMiddleware, apkit=ap)
 templates = Jinja2Templates(directory="templates")
 
+@app.get("/.well-known/webfinger")
+async def webfinger(request: Request, resource: str):
+    if resource.startswith("acct:"):
+        username_split = resource.split(":")[1].split("@")
+        username = username_split[0]
+        if config.HOST != username_split[1]:
+            return Response(content="Not Found", status_code=404)
+        user = await shared.fetch_user_info("microblog.db", username)
+        if user:
+            return JSONResponse(
+                content={
+                    "subject": resource,
+                    "aliases": [f"{config.SCHEME}://{config.HOST}/@{username}"],
+                    "links": [
+                        {
+                            "rel": "self",
+                            "type": "application/activity+json",
+                            "href": f"{config.SCHEME}://{config.HOST}/@{username}",
+                        }
+                    ],
+                },
+                media_type="application/jrd+json",
+            )
+    return Response(content="Not Found", status_code=404)
+
+@app.get("/@{username}")
+async def user(request: Request, username: str):
+    user = await shared.fetch_user_info("microblog.db", username)
+    if user:
+        actor = Person(
+            name=user["name"] if user.get("name") else user["username"],
+            preferredUsername=user["username"],
+            inbox=user["inbox"] if user.get("inbox") else None,
+            sharedInbox=user["shared_inbox"],
+            url=user["url"] if user.get("url") else None,
+            publicKey=CryptographicKey(
+                id=user["key"]["id"],
+                owner=f"{config.SCHEME}://{config.HOST}/@{user['username']}",
+                publicKeyPem=user["key"]["public_key"],
+            ),
+        )
+        return JSONResponse(content=actor.to_dict(), media_type="application/activity+json")
+    return Response(content="Not Found", status_code=404)
 
 @app.get("/")
 async def index(request: Request, username: Union[str, None] = Cookie(default=None), password: Union[str, None] = Cookie(default=None)):
     if await shared.check_users_found("microblog.db"):
         if username and password:
-            if shared.login_user("microblog.db", username, password.encode("utf-8")):
+            if await shared.login_user("microblog.db", username, password.encode("utf-8")):
                 return templates.TemplateResponse(
                     request=request, name="home.html", context={"request": request, "posts": await shared.fetch_posts_with_usernames("microblog.db")}
                 )
