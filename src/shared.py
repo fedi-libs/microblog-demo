@@ -82,9 +82,9 @@ async def create_post(db_path, username, content, host=None):
             )
 
             await db.commit()
-            return True
+            return True, post_id
         else:
-            return False
+            return False, None
 
 
 async def fetch_user_info(db_path, username, host=None):
@@ -103,7 +103,7 @@ async def fetch_user_info(db_path, username, host=None):
         else:
             async with db.execute(
                 """
-            SELECT u.url, u.shared_inbox, u.inbox, u.username, u.name, k.public_key, k.id, k.key_type
+            SELECT u.url, u.shared_inbox, u.inbox, u.username, u.name, k.public_key, k.id, k.key_type, k.private_key
             FROM Users u
             LEFT JOIN Keys k ON u.id = k.user_id
             WHERE u.username = ? AND u.host IS NULL
@@ -121,6 +121,7 @@ async def fetch_user_info(db_path, username, host=None):
                 "name": user_info[0][4],
                 "key": {
                     "public_key": user_info[0][5],
+                    "private_key": user_info[0][8],
                     "id": user_info[0][6],
                     "key_type": user_info[0][7],
                 },

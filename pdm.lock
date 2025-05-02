@@ -5,7 +5,7 @@
 groups = ["default"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:3503ab01526297edd10516b75bef0e928ab0aaef87ff859da582e04c2e38b4a0"
+content_hash = "sha256:0ecf8599651cde8cfa6f9ed34ec1768c83f10e930665b4fff3920fe0bd13af29"
 
 [[metadata.targets]]
 requires_python = "==3.13.*"
@@ -118,9 +118,9 @@ files = [
 
 [[package]]
 name = "apkit"
-version = "0.1.0"
+version = "0.1.dev13"
 requires_python = ">=3.10"
-path = "./lib/apkit-0.1.0-py3-none-any.whl"
+path = "./lib/apkit-0.1.dev13+ge74abb6.d20250502-py3-none-any.whl"
 summary = "Powerful Toolkit for ActivityPub Implementations."
 groups = ["default"]
 dependencies = [
@@ -130,9 +130,10 @@ dependencies = [
     "apsig>=0.4.0",
     "cryptography>=44.0.1",
     "pyfill>=0.1.0",
+    "starlette>=0.46.2",
 ]
 files = [
-    {file = "apkit-0.1.0-py3-none-any.whl", hash = "sha256:a2e9415845a10ecb531c4e4b19f830db7bdd3662841159fd3864534ae947702d"},
+    {file = "apkit-0.1.dev13+ge74abb6.d20250502-py3-none-any.whl", hash = "sha256:d66bb3b6034826d54fb294e9f58a38f74549ac5396f75e97ab3c071e0c01b292"},
 ]
 
 [[package]]
@@ -153,8 +154,9 @@ files = [
 
 [[package]]
 name = "apsig"
-version = "0.5.0"
+version = "0.5.1.dev15"
 requires_python = ">=3.10"
+path = "./lib/apsig-0.5.1.dev15+g643d59a.d20250502-py3-none-any.whl"
 summary = "Signature implementation used in ActivityPub."
 groups = ["default"]
 dependencies = [
@@ -167,8 +169,7 @@ dependencies = [
     "typing-extensions>=4.12.2",
 ]
 files = [
-    {file = "apsig-0.5.0-py3-none-any.whl", hash = "sha256:69a484e715a86346ffc0483c2b1dd3967408cc67421032badfefbe3a4f8e18a4"},
-    {file = "apsig-0.5.0.tar.gz", hash = "sha256:55bca6f59ae8e7e8510f91ccc160cee00cb9c2cc13e9fa473af985d8cfb97d78"},
+    {file = "apsig-0.5.1.dev15+g643d59a.d20250502-py3-none-any.whl", hash = "sha256:f5a3167f0770b834a4cd0bb5a040751b5ae807070e3d8dc45595d81747d64cb4"},
 ]
 
 [[package]]

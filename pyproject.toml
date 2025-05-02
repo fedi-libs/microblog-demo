@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "AmaseCocoa", email = "cocoa@amase.cc"},
 ]
-dependencies = ["fastapi>=0.115.12", "uvicorn[standard]>=0.34.2", "aiosqlite>=0.21.0", "python-multipart>=0.0.20", "jinja2>=3.1.6", "bcrypt>=4.3.0", "apkit @ file:///c:/Users/amase/Documents/microblog-demo/lib/apkit-0.1.0-py3-none-any.whl", "taskiq>=0.11.17"]
+dependencies = ["fastapi>=0.115.12", "uvicorn[standard]>=0.34.2", "aiosqlite>=0.21.0", "python-multipart>=0.0.20", "jinja2>=3.1.6", "bcrypt>=4.3.0", "taskiq>=0.11.17", "apsig @ file:///c:/Users/amase/Documents/microblog-demo/lib/apsig-0.5.1.dev15%2Bg643d59a.d20250502-py3-none-any.whl", "apkit @ file:///c:/Users/amase/Documents/microblog-demo/lib/apkit-0.1.dev13%2Bge74abb6.d20250502-py3-none-any.whl"]
 requires-python = "==3.13.*"
 readme = "README.md"
 license = {text = "MIT"}
