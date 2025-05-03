@@ -4,10 +4,10 @@ from typing import Union
 from apkit import APKit
 from apkit.webfinger import Resource as WebFingerResource
 from apkit.x.starlette import ActivityPubMiddleware
-from apmodel import Person
+from apmodel import Person, Follow
 from apmodel.security.cryptographickey import CryptographicKey
 from fastapi import Cookie, FastAPI, Request, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 from . import setup, shared, db_setup, post, config
@@ -31,6 +31,9 @@ app.include_router(post.router)
 app.add_middleware(ActivityPubMiddleware, apkit=ap)
 templates = Jinja2Templates(directory="templates")
 
+@ap.on(Follow)
+async def on_follow(request, follow: Follow):
+    pass
 
 @ap.webfinger()
 async def webfinger(request: Request, resource: WebFingerResource):
@@ -99,6 +102,11 @@ async def index(
                         ),
                     },
                 )
+            else:
+                response = RedirectResponse("/")
+                response.delete_cookie("username")
+                response.delete_cookie("password")
+                return response
         else:
             return templates.TemplateResponse(request=request, name="login.html")
     else:

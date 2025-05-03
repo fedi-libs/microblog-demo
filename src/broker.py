@@ -13,10 +13,11 @@ async def create_post(username: str, content: str, post_id: str):
     user = await fetch_user_info("microblog.db", username)
     if user:
         create = Create(
-            id=f"{config.SCHEME}://{config.HOST}/posts/{post_id}",
+            id=f"{config.SCHEME}://{config.HOST}/posts/{post_id}/activity",
             actor=user["url"],
             object=Note(
                 id=f"{config.SCHEME}://{config.HOST}/posts/{post_id}",
+                attributedTo=user["url"],
                 content=content,
                 to=["https://www.w3.org/ns/activitystreams#Public"],
             ),
@@ -27,7 +28,7 @@ async def create_post(username: str, content: str, post_id: str):
         )
         async with ApRequest(key_id=user["key"]["id"], private_key=priv_key) as req:
             resp = await req.signed_post(
-                url="",
+                url="https://s.amase.cc/inbox",
                 data=create.to_dict(),
                 headers={"Content-Type": "application/activity+json", "User-Agent": "microblog-demo/0.1.0"},
             )
