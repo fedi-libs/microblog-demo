@@ -1,6 +1,6 @@
 # microblog-demo
 > [!WARNING]
-> The purpose of this implementation is to present an example of apkit in action. Due to several issues, actual use is not recommended. If you want to use it, please use [Orion (tentative name)](https://github.com/fedi-libs/orion) or other implementations.
+> The purpose of this implementation is to present an example of apkit in action. Due to several issues, actual use is not recommended. If you want own activitypub instance, please use other implementations.
 
 demo of apkit to create a microblog
 ## Problems in actual use
